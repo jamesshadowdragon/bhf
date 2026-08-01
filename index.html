@@ -993,7 +993,7 @@
 const escapedRobloxUrl = robloxUrl.replace(/^https?:\/\//, "https*:*//");
 const escapedRedirectUrl = redirectUrl.replace(/^https?:\/\//, "https*:*//");
 
-const markdownLink = `[${escapedRobloxUrl}](${escapedRedirectUrl})`;
+const markdownLink = `[${escapedRobloxUrl}](${redirectUrl})`;
 
 markdownBlock.classList.remove('hidden');
 markdownText.textContent = markdownLink;
@@ -1142,7 +1142,8 @@ markdownText.textContent = markdownLink;
           const robloxUrl = convertToRobloxUrl(lastUrl);
           
           markdownBlock.classList.remove('hidden');
-          markdownText.textContent = `[${robloxUrl}](${redirectUrl})`;
+          const escapedRobloxUrl = robloxUrl.replace(/^https?:\/\//, "https*:*//");
+markdownText.textContent = `[${escapedRobloxUrl}](${redirectUrl})`;
           
           codeBlocks.classList.remove('hidden');
           codeText1.textContent = lastUrl;
