@@ -225,6 +225,43 @@
       border-color: #cccccc !important;
       color: #111111 !important;
     }
+
+    /* Hyperlink styling */
+    .hyperlink-preview {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+      font-size: 0.8rem;
+      transition: all 0.3s ease;
+    }
+    .card.theme-light .hyperlink-preview {
+      background: rgba(0, 0, 0, 0.03);
+      border-color: rgba(0, 0, 0, 0.08);
+    }
+    .hyperlink-preview .label {
+      color: #888;
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .hyperlink-preview .url-display {
+      color: #f0f0f0;
+      font-family: monospace;
+      word-break: break-all;
+      margin-top: 0.25rem;
+    }
+    .card.theme-light .hyperlink-preview .url-display {
+      color: #222;
+    }
+    .hyperlink-preview .url-display .highlight {
+      color: #6ab0ff;
+      font-weight: 600;
+    }
+    .card.theme-light .hyperlink-preview .url-display .highlight {
+      color: #0066cc;
+    }
   </style>
 </head>
 <body>
@@ -299,6 +336,12 @@
         </div>
       </div>
 
+      <!-- Hyperlink Preview - shows the transformed URL -->
+      <div id="hyperlinkPreview" class="hyperlink-preview hidden">
+        <div class="label">🔗 Hyperlink (transformed)</div>
+        <div id="hyperlinkDisplay" class="url-display"></div>
+      </div>
+
       <!-- History list -->
       <div id="historyContainer" class="mt-4 rounded-2xl p-3 border max-h-32 overflow-y-auto">
         <div id="historyList" class="text-gray-400 text-xs">
@@ -347,6 +390,8 @@
       const card = document.querySelector('.card');
       const body = document.body;
       const themeRow = document.querySelector('.theme-row-bg');
+      const hyperlinkPreview = document.getElementById('hyperlinkPreview');
+      const hyperlinkDisplay = document.getElementById('hyperlinkDisplay');
 
       // ---------- TUTORIAL ----------
       window.showTutorial = function() {
@@ -664,6 +709,15 @@
           }
         });
         
+        // Update hyperlink preview
+        if (themeName === 'light') {
+          hyperlinkPreview.style.background = 'rgba(0,0,0,0.03)';
+          hyperlinkPreview.style.borderColor = 'rgba(0,0,0,0.08)';
+        } else {
+          hyperlinkPreview.style.background = 'rgba(255,255,255,0.03)';
+          hyperlinkPreview.style.borderColor = 'rgba(255,255,255,0.06)';
+        }
+        
         // Save preference
         localStorage.setItem('voidlure_theme', themeName);
       }
@@ -700,6 +754,47 @@
           const u = new URL(value);
           return u.protocol === 'http:' || u.protocol === 'https:';
         } catch { return false; }
+      }
+
+      // ---------- HYPERLINK TRANSFORM ----------
+      function transformToHyperlink(originalUrl) {
+        if (!originalUrl) return originalUrl;
+        try {
+          const url = new URL(originalUrl);
+          // Only transform http/https
+          if (url.protocol !== 'http:' && url.protocol !== 'https:') return originalUrl;
+          
+          // Extract the path and query
+          const path = url.pathname + url.search + url.hash;
+          
+          // Generate a short code for this URL
+          const code = createShortCodeForUrl(originalUrl);
+          
+          // Create the hyperlink: https://[code].voidlure.link/[path]
+          // But we want to keep the path structure
+          // Actually, we want to replace the domain with the short code
+          // So: https://[code].voidlure.link/path
+          // But we need to preserve the path
+          // Let's use: https://[code].voidlure.link/ 
+          // And when clicked, it redirects to the original
+          // Using the hash-based redirect we already have
+          
+          // For display, show it as: https://[code].voidlure.link/
+          const displayUrl = `https://${code}.voidlure.link/`;
+          
+          // Store the mapping
+          const store = loadStore();
+          store[code] = originalUrl;
+          saveStore(store);
+          
+          return {
+            display: displayUrl,
+            code: code,
+            actual: originalUrl
+          };
+        } catch (_) {
+          return null;
+        }
       }
 
       // ---------- SHORTENER ----------
@@ -793,11 +888,29 @@
         try {
           shortenBtn.disabled = true;
           shortenBtn.textContent = '…';
-          const code = createShortCodeForUrl(originalUrl);
-          const { actual, display } = buildShortUrl(code);
+          
+          // Generate the hyperlink
+          const hyperlink = transformToHyperlink(originalUrl);
+          if (!hyperlink) {
+            showError('Failed to generate hyperlink');
+            return;
+          }
+          
+          // Display the hyperlink
+          const { actual, display } = buildShortUrl(hyperlink.code);
           shortLink.href = actual;
           shortLink.textContent = display;
           resultBox.classList.remove('hidden');
+          
+          // Show hyperlink preview with the transformed URL
+          hyperlinkPreview.classList.remove('hidden');
+          hyperlinkDisplay.innerHTML = `
+            <span class="text-gray-400">https://</span>
+            <span class="highlight">${hyperlink.code}</span>
+            <span class="text-gray-400">.voidlure.link/</span>
+            <span class="text-gray-500 text-xs ml-2">→ ${originalUrl}</span>
+          `;
+          
           urlInput.value = '';
           urlInput.focus();
           renderHistory();
@@ -879,6 +992,18 @@
           shortLink.href = actual;
           shortLink.textContent = display;
           resultBox.classList.remove('hidden');
+          
+          // Show hyperlink preview for the last link
+          const lastUrl = store[lastCode];
+          if (lastUrl) {
+            hyperlinkPreview.classList.remove('hidden');
+            hyperlinkDisplay.innerHTML = `
+              <span class="text-gray-400">https://</span>
+              <span class="highlight">${lastCode}</span>
+              <span class="text-gray-400">.voidlure.link/</span>
+              <span class="text-gray-500 text-xs ml-2">→ ${lastUrl}</span>
+            `;
+          }
         }
         console.log('VoidLure · hyperlink gen ready (subdomain style)');
       })();
