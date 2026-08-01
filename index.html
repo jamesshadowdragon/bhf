@@ -1,0 +1,612 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>VoidLure · hyperlink gen</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* black & white gradient + glass */
+    body {
+      background: linear-gradient(145deg, #0b0b0b 0%, #1a1a1a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+      padding: 1.5rem;
+    }
+    .card {
+      background: rgba(18, 18, 18, 0.8);
+      backdrop-filter: blur(2px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.8);
+      transition: 0.2s;
+    }
+    .input-dark {
+      background: #141414;
+      border: 1px solid #2a2a2a;
+      color: #f0f0f0;
+    }
+    .input-dark:focus {
+      border-color: #888;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+    }
+    .btn-primary {
+      background: #2a2a2a;
+      color: white;
+      border: 1px solid #3a3a3a;
+      transition: all 0.15s ease;
+    }
+    .btn-primary:hover {
+      background: #3d3d3d;
+      border-color: #777;
+      transform: scale(0.97);
+    }
+    .btn-primary:disabled {
+      opacity: 0.5;
+      transform: none;
+    }
+    .link-highlight {
+      color: #d0d0d0;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      text-decoration-color: #444;
+    }
+    .link-highlight:hover {
+      color: white;
+    }
+    .gradient-text {
+      background: linear-gradient(to right, #f0f0f0, #b0b0b0);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .copy-btn {
+      background: #1f1f1f;
+      border: 1px solid #333;
+      color: #ccc;
+      transition: 0.1s;
+    }
+    .copy-btn:hover {
+      background: #2c2c2c;
+      color: white;
+    }
+    .theme-tag {
+      background: #222;
+      border: 1px solid #333;
+      font-size: 0.65rem;
+      padding: 0.15rem 0.7rem;
+      border-radius: 30px;
+      color: #ccc;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .theme-tag:hover {
+      background: #333;
+      border-color: #555;
+    }
+    .theme-tag.active {
+      background: #3d3d3d;
+      border-color: #888;
+      color: white;
+    }
+    .history-item {
+      border-bottom: 1px solid #262626;
+      padding: 0.3rem 0;
+      font-size: 0.75rem;
+    }
+    .history-item:last-child {
+      border-bottom: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Main Card -->
+  <div class="max-w-2xl w-full">
+
+    <!-- Brand / top bar: VoidLure -->
+    <div class="flex items-center justify-between mb-4 text-white">
+      <div>
+        <h1 class="text-4xl font-black tracking-tight">
+          <span class="gradient-text">VoidLure</span>
+        </h1>
+        <span class="text-[10px] text-gray-500 tracking-[0.2em] font-light ml-1">HYPERLINK</span>
+      </div>
+      <div class="flex gap-6 text-sm text-gray-300">
+        <a href="#" class="hover:text-white border-b border-transparent hover:border-white/30">Tutorials</a>
+        <a href="https://discord.gg/3MD46Af4tD" target="_blank" class="hover:text-white border-b border-transparent hover:border-white/30">Discord</a>
+      </div>
+    </div>
+
+    <!-- Theme row - clickable themes -->
+    <div class="flex flex-wrap items-center gap-2 bg-[#1a1a1a] border border-[#2a2a2a] rounded-full px-4 py-2 mb-5 text-xs text-gray-300">
+      <span class="font-medium text-gray-400 tracking-wider text-[10px]">THEME</span>
+      <span class="theme-tag active" data-theme="default">Default</span>
+      <span class="theme-tag" data-theme="aurora">Aurora</span>
+      <span class="theme-tag" data-theme="twilight">Twilight</span>
+      <span class="theme-tag" data-theme="lavender">Lavender Night</span>
+      <span class="theme-tag" data-theme="mint">Mint Night</span>
+      <span class="theme-tag" data-theme="nebula">Nebula</span>
+      <span class="theme-tag" data-theme="forest">Forest</span>
+      <span class="theme-tag" data-theme="moonlight">Moonlight</span>
+      <span class="theme-tag" data-theme="ocean">Ocean</span>
+      <span class="theme-tag" data-theme="sunset">Sunset</span>
+      <span class="theme-tag" data-theme="crimson">Crimson</span>
+      <span class="theme-tag" data-theme="light">Light</span>
+    </div>
+
+    <!-- Link type / dest / shorten -->
+    <div class="card rounded-3xl p-6 md:p-7 text-white">
+      <!-- TYPE row -->
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-400 font-medium">TYPE</span>
+          <select id="linkType" class="bg-[#1e1e1e] border border-[#333] text-white rounded-full px-3 py-1.5 text-xs">
+            <option>Plain</option>
+            <option selected>Profile</option>
+            <option>Community</option>
+            <option>Private Server</option>
+          </select>
+        </div>
+        <div class="flex-1 min-w-[160px]">
+          <label class="text-[10px] text-gray-400 block">DESTINATION URL</label>
+          <input id="urlInput" type="url" inputmode="url" placeholder="https://www.roblox.com/users/3095250/profile" value="https://www.roblox.com/users/3095250/profile" class="w-full input-dark rounded-full px-4 py-2.5 text-sm placeholder-gray-500" />
+        </div>
+        <button id="shortenBtn" class="btn-primary px-6 py-2.5 rounded-full font-medium text-sm whitespace-nowrap">SHORTEN</button>
+      </div>
+
+      <!-- Result area (short link + history) -->
+      <div id="result" class="mt-3 hidden">
+        <div class="bg-[#141414] rounded-2xl p-4 border border-[#2a2a2a]">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 flex-1 min-w-[140px]">
+              <span class="text-gray-400 text-xs">🔗</span>
+              <a id="shortLink" href="#" target="_blank" rel="noopener" class="link-highlight break-all text-sm flex-1"></a>
+            </div>
+            <button id="copyBtn" class="copy-btn text-xs px-4 py-1.5 rounded-full font-mono">copy</button>
+          </div>
+          <div class="flex items-center gap-2 mt-2 text-[10px] text-gray-500">
+            <span>📋 Save history locally</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- History list -->
+      <div id="historyContainer" class="mt-4 bg-[#111] rounded-2xl p-3 border border-[#252525] max-h-32 overflow-y-auto">
+        <div id="historyList" class="text-gray-400 text-xs">
+          <div class="text-gray-500 italic flex items-center gap-1"><span>⌛</span> no links yet</div>
+        </div>
+      </div>
+
+      <!-- footer drop -->
+      <div class="flex justify-between items-center mt-4 text-[10px] text-gray-500 border-t border-[#252525] pt-3">
+        <span>⬇ drop anywhere.</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // ---------- CONFIG ----------
+      const STORE_KEY = 'voidlure_links_v1';
+
+      // DOM refs
+      const urlInput = document.getElementById('urlInput');
+      const shortenBtn = document.getElementById('shortenBtn');
+      const resultBox = document.getElementById('result');
+      const shortLink = document.getElementById('shortLink');
+      const copyBtn = document.getElementById('copyBtn');
+      const historyList = document.getElementById('historyList');
+      const linkTypeSelect = document.getElementById('linkType');
+      const themeTags = document.querySelectorAll('.theme-tag');
+
+      // ---------- THEME ENGINE ----------
+      const themes = {
+        default: {
+          card: 'rgba(18,18,18,0.8)',
+          border: 'rgba(255,255,255,0.06)',
+          bg: '#141414',
+          input: '#141414',
+          inputBorder: '#2a2a2a',
+          btn: '#2a2a2a',
+          btnBorder: '#3a3a3a',
+          btnHover: '#3d3d3d',
+          text: '#f0f0f0',
+          accent: '#888'
+        },
+        aurora: {
+          card: 'rgba(20,30,50,0.85)',
+          border: 'rgba(100,200,255,0.15)',
+          bg: '#1a2a3a',
+          input: '#0f1f2f',
+          inputBorder: '#2a4a6a',
+          btn: '#1a3a5a',
+          btnBorder: '#3a6a8a',
+          btnHover: '#2a5a7a',
+          text: '#e0f0ff',
+          accent: '#6ab0ff'
+        },
+        twilight: {
+          card: 'rgba(30,20,40,0.85)',
+          border: 'rgba(180,100,200,0.15)',
+          bg: '#2a1a3a',
+          input: '#1a0f2f',
+          inputBorder: '#4a2a6a',
+          btn: '#3a1a5a',
+          btnBorder: '#5a3a8a',
+          btnHover: '#4a2a7a',
+          text: '#f0e0ff',
+          accent: '#b06ad0'
+        },
+        lavender: {
+          card: 'rgba(40,30,60,0.85)',
+          border: 'rgba(200,150,255,0.15)',
+          bg: '#2a1a4a',
+          input: '#1a0f3a',
+          inputBorder: '#4a2a7a',
+          btn: '#3a2a6a',
+          btnBorder: '#5a3a9a',
+          btnHover: '#4a3a8a',
+          text: '#f0e8ff',
+          accent: '#b080e0'
+        },
+        mint: {
+          card: 'rgba(20,40,40,0.85)',
+          border: 'rgba(100,255,200,0.15)',
+          bg: '#0f2a2a',
+          input: '#0a1f1f',
+          inputBorder: '#2a5a5a',
+          btn: '#1a4a4a',
+          btnBorder: '#3a7a7a',
+          btnHover: '#2a6a6a',
+          text: '#e0fff0',
+          accent: '#60d0b0'
+        },
+        nebula: {
+          card: 'rgba(30,20,50,0.85)',
+          border: 'rgba(150,100,255,0.15)',
+          bg: '#1a0f3a',
+          input: '#10082a',
+          inputBorder: '#3a1a7a',
+          btn: '#2a1a6a',
+          btnBorder: '#4a2a9a',
+          btnHover: '#3a2a8a',
+          text: '#f0e8ff',
+          accent: '#a070e0'
+        },
+        forest: {
+          card: 'rgba(20,40,20,0.85)',
+          border: 'rgba(100,200,100,0.15)',
+          bg: '#0f2a0f',
+          input: '#0a1f0a',
+          inputBorder: '#2a5a2a',
+          btn: '#1a4a1a',
+          btnBorder: '#3a7a3a',
+          btnHover: '#2a6a2a',
+          text: '#e8ffe8',
+          accent: '#60c060'
+        },
+        moonlight: {
+          card: 'rgba(30,30,40,0.85)',
+          border: 'rgba(200,200,220,0.15)',
+          bg: '#1a1a2a',
+          input: '#0f0f1f',
+          inputBorder: '#3a3a5a',
+          btn: '#2a2a4a',
+          btnBorder: '#4a4a7a',
+          btnHover: '#3a3a6a',
+          text: '#f0f0ff',
+          accent: '#8888bb'
+        },
+        ocean: {
+          card: 'rgba(20,30,50,0.85)',
+          border: 'rgba(50,150,255,0.15)',
+          bg: '#0f1f3a',
+          input: '#0a152a',
+          inputBorder: '#2a4a7a',
+          btn: '#1a3a6a',
+          btnBorder: '#3a6a9a',
+          btnHover: '#2a5a8a',
+          text: '#e0f0ff',
+          accent: '#5090dd'
+        },
+        sunset: {
+          card: 'rgba(50,30,20,0.85)',
+          border: 'rgba(255,150,100,0.15)',
+          bg: '#3a1f0f',
+          input: '#2a150a',
+          inputBorder: '#6a3a2a',
+          btn: '#5a2a1a',
+          btnBorder: '#8a4a3a',
+          btnHover: '#7a3a2a',
+          text: '#fff0e0',
+          accent: '#dd8860'
+        },
+        crimson: {
+          card: 'rgba(50,20,20,0.85)',
+          border: 'rgba(255,80,80,0.15)',
+          bg: '#3a0f0f',
+          input: '#2a0a0a',
+          inputBorder: '#6a2a2a',
+          btn: '#5a1a1a',
+          btnBorder: '#8a3a3a',
+          btnHover: '#7a2a2a',
+          text: '#ffe8e8',
+          accent: '#dd6060'
+        },
+        light: {
+          card: 'rgba(240,240,240,0.9)',
+          border: 'rgba(0,0,0,0.1)',
+          bg: '#f5f5f5',
+          input: '#ffffff',
+          inputBorder: '#cccccc',
+          btn: '#e0e0e0',
+          btnBorder: '#bbbbbb',
+          btnHover: '#cccccc',
+          text: '#111111',
+          accent: '#666666'
+        }
+      };
+
+      let currentTheme = 'default';
+
+      function applyTheme(themeName) {
+        const theme = themes[themeName];
+        if (!theme) return;
+        currentTheme = themeName;
+        
+        const card = document.querySelector('.card');
+        const resultDiv = document.querySelector('#result .bg-\\[\\#141414\\]');
+        const input = document.querySelector('.input-dark');
+        const btn = document.querySelector('.btn-primary');
+        
+        // Update card
+        card.style.background = theme.card;
+        card.style.borderColor = theme.border;
+        
+        // Update input
+        input.style.background = theme.input;
+        input.style.borderColor = theme.inputBorder;
+        input.style.color = theme.text;
+        
+        // Update button
+        btn.style.background = theme.btn;
+        btn.style.borderColor = theme.btnBorder;
+        btn.style.color = theme.text;
+        
+        // Update result box
+        if (resultDiv) {
+          resultDiv.style.background = theme.bg;
+          resultDiv.style.borderColor = theme.inputBorder;
+        }
+        
+        // Update accent colors
+        document.querySelectorAll('.link-highlight').forEach(el => {
+          el.style.color = theme.accent;
+        });
+        
+        // Update active theme tag
+        themeTags.forEach(tag => {
+          tag.classList.remove('active');
+          if (tag.dataset.theme === themeName) {
+            tag.classList.add('active');
+          }
+        });
+        
+        // Save preference
+        localStorage.setItem('voidlure_theme', themeName);
+      }
+
+      // Theme click handler
+      themeTags.forEach(tag => {
+        tag.addEventListener('click', function() {
+          const theme = this.dataset.theme;
+          if (theme) applyTheme(theme);
+        });
+      });
+
+      // ---------- STORAGE ----------
+      function loadStore() {
+        try {
+          const raw = localStorage.getItem(STORE_KEY);
+          return raw ? JSON.parse(raw) : {};
+        } catch { return {}; }
+      }
+      function saveStore(store) {
+        localStorage.setItem(STORE_KEY, JSON.stringify(store));
+      }
+
+      // ---------- HELPERS ----------
+      function makeRandomCode(len = 6) {
+        const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
+        const arr = new Uint8Array(len);
+        crypto.getRandomValues(arr);
+        return Array.from(arr).map(n => alphabet[n % alphabet.length]).join('');
+      }
+
+      function isValidUrl(value) {
+        try {
+          const u = new URL(value);
+          return u.protocol === 'http:' || u.protocol === 'https:';
+        } catch { return false; }
+      }
+
+      // ---------- SHORTENER ----------
+      function createShortCodeForUrl(longUrl) {
+        const store = loadStore();
+        for (const [code, url] of Object.entries(store)) {
+          if (url === longUrl) return code;
+        }
+        let code;
+        let attempts = 0;
+        do {
+          code = makeRandomCode(6);
+          attempts++;
+          if (attempts > 20) { code = makeRandomCode(8); break; }
+        } while (store[code]);
+        store[code] = longUrl;
+        saveStore(store);
+        return code;
+      }
+
+      // Build short link with subdomain style
+      function buildShortUrl(code) {
+        const base = window.location.origin + window.location.pathname;
+        const shortLink = base.replace(/\/?$/, '/') + '#' + '/' + code;
+        return {
+          actual: shortLink,
+          display: `https://${code}.voidlure.link/`
+        };
+      }
+
+      // ---------- UI ----------
+      function showError(msg) {
+        const err = document.getElementById('errorMsg') || (() => { 
+          const e = document.createElement('p'); 
+          e.id = 'errorMsg'; 
+          e.className = 'text-red-400 text-xs mt-2'; 
+          document.querySelector('.card').appendChild(e); 
+          return e; 
+        })();
+        err.textContent = msg;
+        err.style.display = 'block';
+      }
+      function hideError() {
+        const err = document.getElementById('errorMsg');
+        if (err) { err.style.display = 'none'; }
+      }
+
+      // ---------- RENDER HISTORY ----------
+      function renderHistory() {
+        const store = loadStore();
+        const entries = Object.entries(store);
+        if (entries.length === 0) {
+          historyList.innerHTML = `<div class="text-gray-500 italic flex items-center gap-1"><span>⌛</span> no links yet</div>`;
+          return;
+        }
+        const latest = entries.slice(-6).reverse();
+        let html = '';
+        latest.forEach(([code, url]) => {
+          const { actual, display } = buildShortUrl(code);
+          html += `<div class="history-item flex justify-between items-center text-gray-300">
+            <span class="truncate max-w-[50%] text-[11px]">${url}</span>
+            <a href="${actual}" target="_blank" class="text-white/70 hover:text-white text-[10px] font-mono">${display}</a>
+          </div>`;
+        });
+        historyList.innerHTML = html;
+      }
+
+      // ---------- SHORTEN ACTION ----------
+      async function shortenUrl() {
+        hideError();
+        const originalUrl = urlInput.value.trim();
+        if (!originalUrl) {
+          showError('paste a URL');
+          return;
+        }
+        if (!isValidUrl(originalUrl)) {
+          showError('valid http/https URL required');
+          return;
+        }
+
+        try {
+          shortenBtn.disabled = true;
+          shortenBtn.textContent = '…';
+          const code = createShortCodeForUrl(originalUrl);
+          const { actual, display } = buildShortUrl(code);
+          shortLink.href = actual;
+          shortLink.textContent = display;
+          resultBox.classList.remove('hidden');
+          urlInput.value = '';
+          urlInput.focus();
+          renderHistory();
+        } catch (err) {
+          showError('something went wrong');
+          console.error(err);
+        } finally {
+          shortenBtn.disabled = false;
+          shortenBtn.textContent = 'SHORTEN';
+        }
+      }
+
+      // copy
+      async function copyLink() {
+        const link = shortLink.textContent;
+        if (!link) return;
+        copyBtn.disabled = true;
+        const prev = copyBtn.textContent;
+        try {
+          await navigator.clipboard.writeText(link);
+          copyBtn.textContent = 'copied!';
+          setTimeout(() => { copyBtn.textContent = prev; copyBtn.disabled = false; }, 1400);
+        } catch {
+          try {
+            const tmp = document.createElement('textarea');
+            tmp.value = link;
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand('copy');
+            document.body.removeChild(tmp);
+            copyBtn.textContent = 'copied!';
+            setTimeout(() => { copyBtn.textContent = prev; copyBtn.disabled = false; }, 1400);
+          } catch {
+            copyBtn.textContent = 'failed';
+            setTimeout(() => { copyBtn.textContent = prev; copyBtn.disabled = false; }, 1400);
+          }
+        }
+      }
+
+      // ---------- REDIRECT (hash) ----------
+      function handleHashRedirect() {
+        const hash = window.location.hash || '';
+        if (!hash.startsWith('#/')) return;
+        const code = hash.slice(2);
+        if (!code) return;
+        const store = loadStore();
+        const longUrl = store[code];
+        if (longUrl) {
+          window.location.replace(longUrl);
+        } else {
+          window.location.hash = '';
+          showError('short link not found');
+        }
+      }
+
+      // ---------- EVENTS ----------
+      shortenBtn.addEventListener('click', shortenUrl);
+      copyBtn.addEventListener('click', copyLink);
+      urlInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') shortenUrl();
+      });
+      window.addEventListener('hashchange', handleHashRedirect);
+
+      // ---------- INIT ----------
+      (function init() {
+        handleHashRedirect();
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('voidlure_theme') || 'default';
+        applyTheme(savedTheme);
+        
+        renderHistory();
+        // show example short if any
+        const store = loadStore();
+        const keys = Object.keys(store);
+        if (keys.length > 0) {
+          const lastCode = keys[keys.length - 1];
+          const { actual, display } = buildShortUrl(lastCode);
+          shortLink.href = actual;
+          shortLink.textContent = display;
+          resultBox.classList.remove('hidden');
+        }
+        console.log('VoidLure · hyperlink gen ready (subdomain style)');
+      })();
+
+    })();
+  </script>
+
+</body>
+</html>
