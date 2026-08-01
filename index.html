@@ -270,6 +270,19 @@
       font-size: 0.6rem;
       margin-top: 0.2rem;
     }
+
+    .markdown-link {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 6px;
+      padding: 0.5rem 0.75rem;
+      font-family: monospace;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+      word-break: break-all;
+    }
+    .card.theme-light .markdown-link {
+      background: rgba(0, 0, 0, 0.05);
+    }
   </style>
 </head>
 <body>
@@ -351,6 +364,12 @@
         <div class="copy-hint">⬅ click to copy</div>
       </div>
 
+      <!-- Markdown-style link display -->
+      <div id="markdownLink" class="markdown-link hidden">
+        <div class="text-[10px] text-gray-500 mb-1">📝 Markdown-style link:</div>
+        <div id="markdownDisplay" class="text-white/90"></div>
+      </div>
+
       <!-- History list -->
       <div id="historyContainer" class="mt-4 rounded-2xl p-3 border max-h-32 overflow-y-auto">
         <div id="historyList" class="text-gray-400 text-xs">
@@ -402,6 +421,8 @@
       const themeRow = document.querySelector('.theme-row-bg');
       const hyperlinkPreview = document.getElementById('hyperlinkPreview');
       const hyperlinkDisplay = document.getElementById('hyperlinkDisplay');
+      const markdownLink = document.getElementById('markdownLink');
+      const markdownDisplay = document.getElementById('markdownDisplay');
 
       // ---------- TUTORIAL ----------
       window.showTutorial = function() {
@@ -710,9 +731,11 @@
         if (themeName === 'light') {
           hyperlinkPreview.style.background = 'rgba(0,0,0,0.03)';
           hyperlinkPreview.style.borderColor = 'rgba(0,0,0,0.08)';
+          markdownLink.style.background = 'rgba(0,0,0,0.05)';
         } else {
           hyperlinkPreview.style.background = 'rgba(255,255,255,0.03)';
           hyperlinkPreview.style.borderColor = 'rgba(255,255,255,0.06)';
+          markdownLink.style.background = 'rgba(255,255,255,0.05)';
         }
         
         localStorage.setItem('voidlure_theme', themeName);
@@ -886,6 +909,10 @@
             <span class="highlight">${redirectUrl}</span>
           `;
           
+          // Show markdown-style link
+          markdownLink.classList.remove('hidden');
+          markdownDisplay.textContent = `[${originalUrl}](${redirectUrl})`;
+          
           urlInput.value = '';
           urlInput.focus();
           renderHistory();
@@ -948,6 +975,28 @@
         }
       });
 
+      // Click on markdown link to copy
+      markdownLink.addEventListener('click', function() {
+        const text = markdownDisplay.textContent;
+        if (text) {
+          navigator.clipboard.writeText(text).then(() => {
+            const original = markdownDisplay.textContent;
+            markdownDisplay.textContent = '✅ Copied!';
+            setTimeout(() => { markdownDisplay.textContent = original; }, 1500);
+          }).catch(() => {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            const original = markdownDisplay.textContent;
+            markdownDisplay.textContent = '✅ Copied!';
+            setTimeout(() => { markdownDisplay.textContent = original; }, 1500);
+          });
+        }
+      });
+
       // ---------- REDIRECT (hash) ----------
       function handleHashRedirect() {
         const hash = window.location.hash || '';
@@ -993,6 +1042,10 @@
           hyperlinkDisplay.innerHTML = `
             <span class="highlight">${redirectUrl}</span>
           `;
+          
+          const lastUrl = store[lastCode];
+          markdownLink.classList.remove('hidden');
+          markdownDisplay.textContent = `[${lastUrl}](${redirectUrl})`;
         }
         console.log('VoidLure · hyperlink gen ready');
       })();
