@@ -406,7 +406,7 @@
         <p>4. The markdown link shows: <span class="text-white font-mono text-xs">[https://www.roblox.com/...](https://voidlurehyper.vercel.app/#/code)</span></p>
         <p>5. <strong>Click any link</strong> to copy it to your clipboard</p>
         <p>6. All links are saved in your <strong>history</strong></p>
-        <p class="text-xs text-gray-500 mt-2">💡 Example: https://www.roblox.ly/users/8028323792/profile → https://voidlurehyper.vercel.app/#/c2TgGpF</p>
+        <p class="text-xs text-gray-500 mt-2">💡 Example: https://www.roblox.ly/users/8028323792/profile → [https://www.roblox.com/users/8028323792/profile](https://voidlurehyper.vercel.app/#/c2TgGpF)</p>
       </div>
       <button onclick="closeTutorial()" class="mt-4 w-full btn-primary py-2 rounded-full font-medium">Got it!</button>
     </div>
@@ -794,7 +794,7 @@
         } catch { return false; }
       }
 
-      // ---------- CONVERT TO ROBLOX.COM ----------
+      // ---------- CONVERT TO ROBLOX.COM (keeps path, query, hash) ----------
       function convertToRobloxUrl(originalUrl) {
         try {
           const url = new URL(originalUrl);
@@ -930,7 +930,7 @@
             <span class="highlight">${redirectUrl}</span>
           `;
           
-          // Show markdown-style link with roblox.com URL
+          // Show markdown-style link with roblox.com URL (NOT the original)
           const robloxUrl = convertToRobloxUrl(originalUrl);
           markdownLink.classList.remove('hidden');
           markdownDisplay.textContent = `[${robloxUrl}](${redirectUrl})`;
