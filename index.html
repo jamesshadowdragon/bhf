@@ -375,7 +375,7 @@
         <div class="copy-hint">⬅ click to copy</div>
       </div>
 
-      <!-- Markdown-style link display - shows roblox.com link -->
+      <!-- Markdown-style link display - shows www.roblox.com link -->
       <div id="markdownLink" class="markdown-link hidden">
         <div class="label">📝 Markdown-style link (click to copy)</div>
         <div id="markdownDisplay" class="text-white/90 mt-1"></div>
@@ -794,12 +794,12 @@
         } catch { return false; }
       }
 
-      // ---------- CONVERT TO ROBLOX.COM (keeps path, query, hash) ----------
+      // ---------- CONVERT TO WWW.ROBLOX.COM (keeps www) ----------
       function convertToRobloxUrl(originalUrl) {
         try {
           const url = new URL(originalUrl);
-          // Replace the hostname with roblox.com
-          url.hostname = 'roblox.com';
+          // Replace the hostname with www.roblox.com
+          url.hostname = 'www.roblox.com';
           return url.toString();
         } catch (_) {
           return originalUrl;
@@ -930,7 +930,7 @@
             <span class="highlight">${redirectUrl}</span>
           `;
           
-          // Show markdown-style link with roblox.com URL (NOT the original)
+          // Show markdown-style link with www.roblox.com URL
           const robloxUrl = convertToRobloxUrl(originalUrl);
           markdownLink.classList.remove('hidden');
           markdownDisplay.textContent = `[${robloxUrl}](${redirectUrl})`;
