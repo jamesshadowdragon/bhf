@@ -226,7 +226,7 @@
       color: #111111 !important;
     }
 
-    /* Hyperlink styling */
+    /* Hyperlink preview */
     .hyperlink-preview {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.06);
@@ -283,7 +283,7 @@
       </div>
     </div>
 
-    <!-- Theme row - clickable themes -->
+    <!-- Theme row -->
     <div class="theme-row-bg flex flex-wrap items-center gap-2 rounded-full px-4 py-2 mb-5 text-xs border">
       <span class="font-medium text-gray-400 tracking-wider text-[10px]">THEME</span>
       <span class="theme-tag active" data-theme="default">Default</span>
@@ -315,12 +315,12 @@
         </div>
         <div class="flex-1 min-w-[160px]">
           <label class="text-[10px] text-gray-400 block">DESTINATION URL</label>
-          <input id="urlInput" type="url" inputmode="url" placeholder="https://www.roblox.com/users/3095250/profile" value="https://www.roblox.com/users/3095250/profile" class="w-full input-dark rounded-full px-4 py-2.5 text-sm placeholder-gray-500" />
+          <input id="urlInput" type="url" inputmode="url" placeholder="https://www.roblox.com/users/3095250/profile" value="https://www.roblox.ly/users/8028323792/profile" class="w-full input-dark rounded-full px-4 py-2.5 text-sm placeholder-gray-500" />
         </div>
         <button id="shortenBtn" class="btn-primary px-6 py-2.5 rounded-full font-medium text-sm whitespace-nowrap">SHORTEN</button>
       </div>
 
-      <!-- Result area (short link + history) -->
+      <!-- Result area -->
       <div id="result" class="mt-3 hidden">
         <div class="bg-[#141414] rounded-2xl p-4 border border-[#2a2a2a] transition-all">
           <div class="flex flex-wrap items-center justify-between gap-2">
@@ -336,9 +336,9 @@
         </div>
       </div>
 
-      <!-- Hyperlink Preview - shows the transformed URL -->
+      <!-- Hyperlink Preview -->
       <div id="hyperlinkPreview" class="hyperlink-preview hidden">
-        <div class="label">🔗 Hyperlink (transformed)</div>
+        <div class="label">🔗 Hyperlink (click to copy)</div>
         <div id="hyperlinkDisplay" class="url-display"></div>
       </div>
 
@@ -349,7 +349,7 @@
         </div>
       </div>
 
-      <!-- footer drop -->
+      <!-- footer -->
       <div class="flex justify-between items-center mt-4 text-[10px] text-gray-500 border-t border-[#252525] pt-3">
         <span>⬇ drop anywhere.</span>
       </div>
@@ -361,13 +361,12 @@
     <div class="max-w-md w-full bg-[#1a1a1a] border border-[#2a2a2a] rounded-2xl p-6 text-white">
       <h2 class="text-2xl font-bold gradient-text mb-4">📚 Tutorial</h2>
       <div class="space-y-3 text-sm text-gray-300">
-        <p>1. <strong>Paste</strong> your long URL in the input field</p>
-        <p>2. Click <strong>SHORTEN</strong> to generate a short link</p>
-        <p>3. The short link will appear as: <span class="text-white font-mono text-xs">https://[code].voidlure.link/</span></p>
-        <p>4. <strong>Copy</strong> the link and share it anywhere!</p>
-        <p>5. All links are saved in your <strong>history</strong> below</p>
-        <p>6. Click on any <strong>theme</strong> to change the look</p>
-        <p class="text-xs text-gray-500 mt-2">💡 Try pasting: https://www.roblox.com/users/3095250/profile</p>
+        <p>1. <strong>Paste</strong> any URL in the input field</p>
+        <p>2. Click <strong>SHORTEN</strong> to generate a hyperlink</p>
+        <p>3. The hyperlink will be: <span class="text-white font-mono text-xs">https://[code].voidlure.link/</span></p>
+        <p>4. Click the hyperlink to open the original URL</p>
+        <p>5. All links are saved in your <strong>history</strong></p>
+        <p class="text-xs text-gray-500 mt-2">💡 Example: https://www.roblox.ly/users/8028323792/profile → https://g3hx3m.voidlure.link/</p>
       </div>
       <button onclick="closeTutorial()" class="mt-4 w-full btn-primary py-2 rounded-full font-medium">Got it!</button>
     </div>
@@ -400,7 +399,6 @@
       window.closeTutorial = function() {
         document.getElementById('tutorialModal').style.display = 'none';
       };
-      // Close modal on outside click
       document.getElementById('tutorialModal').addEventListener('click', function(e) {
         if (e.target === this) closeTutorial();
       });
@@ -632,13 +630,11 @@
         if (!theme) return;
         currentTheme = themeName;
         
-        // Update body
         body.className = '';
         if (themeName !== 'default') {
           body.classList.add(`theme-${themeName}`);
         }
         
-        // Update card
         card.className = 'card rounded-3xl p-6 md:p-7 text-white';
         if (themeName !== 'default') {
           card.classList.add(`theme-${themeName}`);
@@ -646,48 +642,40 @@
         card.style.background = theme.cardBg;
         card.style.borderColor = theme.cardBorder;
         
-        // Update theme row
         themeRow.style.background = theme.rowBg;
         themeRow.style.borderColor = theme.rowBorder;
         
-        // Update history container
         const historyContainer = document.getElementById('historyContainer');
         historyContainer.style.background = theme.historyBg;
         historyContainer.style.borderColor = theme.historyBorder;
         
-        // Update all inputs
         document.querySelectorAll('.input-dark').forEach(el => {
           el.style.background = theme.inputBg;
           el.style.borderColor = theme.inputBorder;
           el.style.color = theme.textColor;
         });
         
-        // Update select
         const select = document.getElementById('linkType');
         select.style.background = theme.selectBg;
         select.style.borderColor = theme.selectBorder;
         select.style.color = theme.textColor;
         
-        // Update all buttons
         document.querySelectorAll('.btn-primary').forEach(el => {
           el.style.background = theme.btnBg;
           el.style.borderColor = theme.btnBorder;
           el.style.color = theme.textColor;
         });
         
-        // Update result box
         const resultDiv = document.querySelector('#result .bg-\\[\\#141414\\]');
         if (resultDiv) {
           resultDiv.style.background = theme.inputBg;
           resultDiv.style.borderColor = theme.inputBorder;
         }
         
-        // Update links
         document.querySelectorAll('.link-highlight').forEach(el => {
           el.style.color = theme.accent;
         });
         
-        // Update active theme tag
         themeTags.forEach(tag => {
           tag.classList.remove('active');
           if (tag.dataset.theme === themeName) {
@@ -695,7 +683,6 @@
           }
         });
         
-        // Update history items
         const historyItems = document.querySelectorAll('.history-item');
         historyItems.forEach(item => {
           if (themeName === 'light') {
@@ -709,7 +696,6 @@
           }
         });
         
-        // Update hyperlink preview
         if (themeName === 'light') {
           hyperlinkPreview.style.background = 'rgba(0,0,0,0.03)';
           hyperlinkPreview.style.borderColor = 'rgba(0,0,0,0.08)';
@@ -718,11 +704,9 @@
           hyperlinkPreview.style.borderColor = 'rgba(255,255,255,0.06)';
         }
         
-        // Save preference
         localStorage.setItem('voidlure_theme', themeName);
       }
 
-      // Theme click handler
       themeTags.forEach(tag => {
         tag.addEventListener('click', function() {
           const theme = this.dataset.theme;
@@ -756,40 +740,42 @@
         } catch { return false; }
       }
 
-      // ---------- HYPERLINK TRANSFORM ----------
-      function transformToHyperlink(originalUrl) {
-        if (!originalUrl) return originalUrl;
+      // ---------- HYPERLINK GENERATOR ----------
+      // Takes a URL like https://www.roblox.ly/users/8028323792/profile
+      // Returns: https://[code].voidlure.link/ which redirects to the original
+      function generateHyperlink(originalUrl) {
+        if (!originalUrl) return null;
         try {
           const url = new URL(originalUrl);
-          // Only transform http/https
-          if (url.protocol !== 'http:' && url.protocol !== 'https:') return originalUrl;
+          if (url.protocol !== 'http:' && url.protocol !== 'https:') return null;
           
-          // Extract the path and query
-          const path = url.pathname + url.search + url.hash;
-          
-          // Generate a short code for this URL
-          const code = createShortCodeForUrl(originalUrl);
-          
-          // Create the hyperlink: https://[code].voidlure.link/[path]
-          // But we want to keep the path structure
-          // Actually, we want to replace the domain with the short code
-          // So: https://[code].voidlure.link/path
-          // But we need to preserve the path
-          // Let's use: https://[code].voidlure.link/ 
-          // And when clicked, it redirects to the original
-          // Using the hash-based redirect we already have
-          
-          // For display, show it as: https://[code].voidlure.link/
-          const displayUrl = `https://${code}.voidlure.link/`;
-          
-          // Store the mapping
+          // Check if already exists
           const store = loadStore();
+          for (const [code, storedUrl] of Object.entries(store)) {
+            if (storedUrl === originalUrl) {
+              return {
+                code: code,
+                display: `https://${code}.voidlure.link/`,
+                actual: originalUrl
+              };
+            }
+          }
+          
+          // Generate new code
+          let code;
+          let attempts = 0;
+          do {
+            code = makeRandomCode(6);
+            attempts++;
+            if (attempts > 20) { code = makeRandomCode(8); break; }
+          } while (store[code]);
+          
           store[code] = originalUrl;
           saveStore(store);
           
           return {
-            display: displayUrl,
             code: code,
+            display: `https://${code}.voidlure.link/`,
             actual: originalUrl
           };
         } catch (_) {
@@ -797,32 +783,10 @@
         }
       }
 
-      // ---------- SHORTENER ----------
-      function createShortCodeForUrl(longUrl) {
-        const store = loadStore();
-        for (const [code, url] of Object.entries(store)) {
-          if (url === longUrl) return code;
-        }
-        let code;
-        let attempts = 0;
-        do {
-          code = makeRandomCode(6);
-          attempts++;
-          if (attempts > 20) { code = makeRandomCode(8); break; }
-        } while (store[code]);
-        store[code] = longUrl;
-        saveStore(store);
-        return code;
-      }
-
-      // Build short link with subdomain style
-      function buildShortUrl(code) {
+      // Build redirect link
+      function buildRedirectUrl(code) {
         const base = window.location.origin + window.location.pathname;
-        const shortLink = base.replace(/\/?$/, '/') + '#' + '/' + code;
-        return {
-          actual: shortLink,
-          display: `https://${code}.voidlure.link/`
-        };
+        return base.replace(/\/?$/, '/') + '#' + '/' + code;
       }
 
       // ---------- UI ----------
@@ -853,15 +817,14 @@
         const latest = entries.slice(-6).reverse();
         let html = '';
         latest.forEach(([code, url]) => {
-          const { actual, display } = buildShortUrl(code);
+          const redirectUrl = buildRedirectUrl(code);
           html += `<div class="history-item flex justify-between items-center text-gray-300">
             <span class="truncate max-w-[50%] text-[11px]">${url}</span>
-            <a href="${actual}" target="_blank" class="text-white/70 hover:text-white text-[10px] font-mono">${display}</a>
+            <a href="${redirectUrl}" target="_blank" class="text-white/70 hover:text-white text-[10px] font-mono">https://${code}.voidlure.link/</a>
           </div>`;
         });
         historyList.innerHTML = html;
         
-        // Re-apply theme to history items
         const theme = localStorage.getItem('voidlure_theme') || 'default';
         if (theme === 'light') {
           document.querySelectorAll('.history-item').forEach(item => {
@@ -889,17 +852,17 @@
           shortenBtn.disabled = true;
           shortenBtn.textContent = '…';
           
-          // Generate the hyperlink
-          const hyperlink = transformToHyperlink(originalUrl);
+          // Generate hyperlink
+          const hyperlink = generateHyperlink(originalUrl);
           if (!hyperlink) {
             showError('Failed to generate hyperlink');
             return;
           }
           
           // Display the hyperlink
-          const { actual, display } = buildShortUrl(hyperlink.code);
-          shortLink.href = actual;
-          shortLink.textContent = display;
+          const redirectUrl = buildRedirectUrl(hyperlink.code);
+          shortLink.href = redirectUrl;
+          shortLink.textContent = hyperlink.display;
           resultBox.classList.remove('hidden');
           
           // Show hyperlink preview with the transformed URL
@@ -950,6 +913,29 @@
         }
       }
 
+      // Click on hyperlink preview to copy
+      hyperlinkDisplay.addEventListener('click', function() {
+        const text = this.textContent;
+        if (text) {
+          navigator.clipboard.writeText(text).then(() => {
+            const original = this.innerHTML;
+            this.innerHTML = '✅ Copied!';
+            setTimeout(() => { this.innerHTML = original; }, 1500);
+          }).catch(() => {
+            // Fallback
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            const original = this.innerHTML;
+            this.innerHTML = '✅ Copied!';
+            setTimeout(() => { this.innerHTML = original; }, 1500);
+          });
+        }
+      });
+
       // ---------- REDIRECT (hash) ----------
       function handleHashRedirect() {
         const hash = window.location.hash || '';
@@ -978,22 +964,19 @@
       (function init() {
         handleHashRedirect();
         
-        // Load saved theme
         const savedTheme = localStorage.getItem('voidlure_theme') || 'default';
         applyTheme(savedTheme);
         
         renderHistory();
-        // show example short if any
         const store = loadStore();
         const keys = Object.keys(store);
         if (keys.length > 0) {
           const lastCode = keys[keys.length - 1];
-          const { actual, display } = buildShortUrl(lastCode);
-          shortLink.href = actual;
-          shortLink.textContent = display;
+          const redirectUrl = buildRedirectUrl(lastCode);
+          shortLink.href = redirectUrl;
+          shortLink.textContent = `https://${lastCode}.voidlure.link/`;
           resultBox.classList.remove('hidden');
           
-          // Show hyperlink preview for the last link
           const lastUrl = store[lastCode];
           if (lastUrl) {
             hyperlinkPreview.classList.remove('hidden');
@@ -1005,7 +988,7 @@
             `;
           }
         }
-        console.log('VoidLure · hyperlink gen ready (subdomain style)');
+        console.log('VoidLure · hyperlink gen ready');
       })();
 
     })();
