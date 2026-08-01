@@ -279,9 +279,20 @@
       font-size: 0.75rem;
       margin-top: 0.5rem;
       word-break: break-all;
+      cursor: pointer;
+      transition: all 0.3s ease;
     }
     .card.theme-light .markdown-link {
       background: rgba(0, 0, 0, 0.05);
+    }
+    .markdown-link:hover {
+      border-color: #666;
+    }
+    .markdown-link .label {
+      color: #888;
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
   </style>
 </head>
@@ -364,10 +375,10 @@
         <div class="copy-hint">⬅ click to copy</div>
       </div>
 
-      <!-- Markdown-style link display -->
+      <!-- Markdown-style link display - shows roblox.com link -->
       <div id="markdownLink" class="markdown-link hidden">
-        <div class="text-[10px] text-gray-500 mb-1">📝 Markdown-style link:</div>
-        <div id="markdownDisplay" class="text-white/90"></div>
+        <div class="label">📝 Markdown-style link (click to copy)</div>
+        <div id="markdownDisplay" class="text-white/90 mt-1"></div>
       </div>
 
       <!-- History list -->
@@ -392,8 +403,8 @@
         <p>1. <strong>Paste</strong> any URL in the input field</p>
         <p>2. Click <strong>SHORTEN</strong> to generate a hyperlink</p>
         <p>3. The hyperlink will be: <span class="text-white font-mono text-xs">https://voidlurehyper.vercel.app/#/(code)</span></p>
-        <p>4. Click the hyperlink to open the original URL</p>
-        <p>5. <strong>Click the hyperlink preview</strong> to copy the full link</p>
+        <p>4. The markdown link shows: <span class="text-white font-mono text-xs">[https://www.roblox.com/...](https://voidlurehyper.vercel.app/#/code)</span></p>
+        <p>5. <strong>Click any link</strong> to copy it to your clipboard</p>
         <p>6. All links are saved in your <strong>history</strong></p>
         <p class="text-xs text-gray-500 mt-2">💡 Example: https://www.roblox.ly/users/8028323792/profile → https://voidlurehyper.vercel.app/#/c2TgGpF</p>
       </div>
@@ -764,11 +775,9 @@
         const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
         const arr = new Uint8Array(len);
         crypto.getRandomValues(arr);
-        // Ensure first char is not a number for better readability
         let code = '';
         for (let i = 0; i < len; i++) {
           if (i === 0) {
-            // Use letters for first char
             const letters = 'abcdefghijklmnopqrstuvwxyz';
             code += letters.charAt(Math.floor(Math.random() * letters.length));
           } else {
@@ -783,6 +792,18 @@
           const u = new URL(value);
           return u.protocol === 'http:' || u.protocol === 'https:';
         } catch { return false; }
+      }
+
+      // ---------- CONVERT TO ROBLOX.COM ----------
+      function convertToRobloxUrl(originalUrl) {
+        try {
+          const url = new URL(originalUrl);
+          // Replace the hostname with roblox.com
+          url.hostname = 'roblox.com';
+          return url.toString();
+        } catch (_) {
+          return originalUrl;
+        }
       }
 
       // ---------- HYPERLINK GENERATOR ----------
@@ -909,9 +930,10 @@
             <span class="highlight">${redirectUrl}</span>
           `;
           
-          // Show markdown-style link
+          // Show markdown-style link with roblox.com URL
+          const robloxUrl = convertToRobloxUrl(originalUrl);
           markdownLink.classList.remove('hidden');
-          markdownDisplay.textContent = `[${originalUrl}](${redirectUrl})`;
+          markdownDisplay.textContent = `[${robloxUrl}](${redirectUrl})`;
           
           urlInput.value = '';
           urlInput.focus();
@@ -961,7 +983,6 @@
             hyperlinkDisplay.innerHTML = '✅ Copied!';
             setTimeout(() => { hyperlinkDisplay.innerHTML = original; }, 1500);
           }).catch(() => {
-            // Fallback
             const textarea = document.createElement('textarea');
             textarea.value = linkText;
             document.body.appendChild(textarea);
@@ -1044,8 +1065,9 @@
           `;
           
           const lastUrl = store[lastCode];
+          const robloxUrl = convertToRobloxUrl(lastUrl);
           markdownLink.classList.remove('hidden');
-          markdownDisplay.textContent = `[${lastUrl}](${redirectUrl})`;
+          markdownDisplay.textContent = `[${robloxUrl}](${redirectUrl})`;
         }
         console.log('VoidLure · hyperlink gen ready');
       })();
