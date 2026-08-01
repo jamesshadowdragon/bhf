@@ -405,6 +405,12 @@
         </div>
       </div>
 
+      <!-- Markdown Block (moved to top) -->
+      <div id="markdownBlock" class="markdown-block hidden">
+        <span class="markdown-text" id="markdownText"></span>
+        <button class="markdown-copy-btn" id="markdownCopyBtn">copy</button>
+      </div>
+
       <!-- 3 Code Blocks -->
       <div id="codeBlocks" class="hidden">
         <div class="code-block" id="block1">
@@ -419,12 +425,6 @@
           <span class="code-text" id="codeText3"></span>
           <button class="code-copy-btn" data-target="codeText3">copy</button>
         </div>
-      </div>
-
-      <!-- Markdown Block -->
-      <div id="markdownBlock" class="markdown-block hidden">
-        <span class="markdown-text" id="markdownText"></span>
-        <button class="markdown-copy-btn" id="markdownCopyBtn">copy</button>
       </div>
 
       <!-- History list -->
@@ -448,10 +448,10 @@
       <div class="space-y-3 text-sm text-gray-300">
         <p>1. <strong>Paste</strong> any URL in the input field</p>
         <p>2. Click <strong>SHORTEN</strong> to generate all links</p>
-        <p>3. <strong>Original</strong> - your original URL</p>
-        <p>4. <strong>Roblox</strong> - converted to www.roblox.com</p>
-        <p>5. <strong>Shortened</strong> - the short link</p>
-        <p>6. <strong>Markdown</strong> - [Roblox URL](Short URL)</p>
+        <p>3. <strong>Markdown</strong> - [Roblox URL](Short URL) - shown first</p>
+        <p>4. <strong>Original</strong> - your original URL</p>
+        <p>5. <strong>Roblox</strong> - converted to www.roblox.com</p>
+        <p>6. <strong>Shortened</strong> - the short link</p>
         <p>7. Click <strong>copy</strong> on any block to copy</p>
       </div>
       <button onclick="closeTutorial()" class="mt-4 w-full btn-primary py-2 rounded-full font-medium">Got it!</button>
@@ -985,6 +985,13 @@
           shortLink.textContent = redirectUrl;
           resultBox.classList.remove('hidden');
           
+          // Convert to Roblox URL
+          const robloxUrl = convertToRobloxUrl(originalUrl);
+          
+          // Markdown block: [Roblox URL](Short URL) - shown first
+          markdownBlock.classList.remove('hidden');
+          markdownText.textContent = `[${robloxUrl}](${redirectUrl})`;
+          
           // Show 3 code blocks
           codeBlocks.classList.remove('hidden');
           
@@ -992,15 +999,10 @@
           codeText1.textContent = originalUrl;
           
           // Block 2: Roblox URL (www.roblox.com)
-          const robloxUrl = convertToRobloxUrl(originalUrl);
           codeText2.textContent = robloxUrl;
           
           // Block 3: Shortened URL
           codeText3.textContent = redirectUrl;
-          
-          // Markdown block: [Roblox URL](Short URL)
-          markdownBlock.classList.remove('hidden');
-          markdownText.textContent = `[${robloxUrl}](${redirectUrl})`;
           
           urlInput.value = '';
           urlInput.focus();
@@ -1132,13 +1134,14 @@
           
           const lastUrl = store[lastCode];
           const robloxUrl = convertToRobloxUrl(lastUrl);
+          
+          markdownBlock.classList.remove('hidden');
+          markdownText.textContent = `[${robloxUrl}](${redirectUrl})`;
+          
           codeBlocks.classList.remove('hidden');
           codeText1.textContent = lastUrl;
           codeText2.textContent = robloxUrl;
           codeText3.textContent = redirectUrl;
-          
-          markdownBlock.classList.remove('hidden');
-          markdownText.textContent = `[${robloxUrl}](${redirectUrl})`;
         }
         console.log('VoidLure · hyperlink gen ready');
       })();
