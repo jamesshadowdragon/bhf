@@ -226,51 +226,6 @@
       color: #111111 !important;
     }
 
-    .hyperlink-preview {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 0.75rem 1rem;
-      margin-top: 0.75rem;
-      font-size: 0.8rem;
-      transition: all 0.3s ease;
-      cursor: pointer;
-    }
-    .card.theme-light .hyperlink-preview {
-      background: rgba(0, 0, 0, 0.03);
-      border-color: rgba(0, 0, 0, 0.08);
-    }
-    .hyperlink-preview:hover {
-      border-color: #666;
-    }
-    .hyperlink-preview .label {
-      color: #888;
-      font-size: 0.65rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-    .hyperlink-preview .url-display {
-      color: #f0f0f0;
-      font-family: monospace;
-      word-break: break-all;
-      margin-top: 0.25rem;
-    }
-    .card.theme-light .hyperlink-preview .url-display {
-      color: #222;
-    }
-    .hyperlink-preview .url-display .highlight {
-      color: #6ab0ff;
-      font-weight: 600;
-    }
-    .card.theme-light .hyperlink-preview .url-display .highlight {
-      color: #0066cc;
-    }
-    .hyperlink-preview .copy-hint {
-      color: #666;
-      font-size: 0.6rem;
-      margin-top: 0.2rem;
-    }
-
     /* Code block style */
     .code-block {
       background: #0d0d0d;
@@ -397,10 +352,23 @@
         </div>
       </div>
 
-      <!-- Code Block with www.roblox.com link -->
-      <div id="codeBlock" class="code-block hidden">
-        <span class="code-text" id="codeText"></span>
-        <button class="code-copy-btn" id="codeCopyBtn">copy</button>
+      <!-- 3 Code Blocks -->
+      <div id="codeBlocks" class="hidden">
+        <!-- Block 1: Original URL -->
+        <div class="code-block" id="block1">
+          <span class="code-text" id="codeText1"></span>
+          <button class="code-copy-btn" data-target="codeText1">copy</button>
+        </div>
+        <!-- Block 2: Roblox URL -->
+        <div class="code-block" id="block2">
+          <span class="code-text" id="codeText2"></span>
+          <button class="code-copy-btn" data-target="codeText2">copy</button>
+        </div>
+        <!-- Block 3: Shortened URL -->
+        <div class="code-block" id="block3">
+          <span class="code-text" id="codeText3"></span>
+          <button class="code-copy-btn" data-target="codeText3">copy</button>
+        </div>
       </div>
 
       <!-- History list -->
@@ -423,12 +391,11 @@
       <h2 class="text-2xl font-bold gradient-text mb-4">📚 Tutorial</h2>
       <div class="space-y-3 text-sm text-gray-300">
         <p>1. <strong>Paste</strong> any URL in the input field</p>
-        <p>2. Click <strong>SHORTEN</strong> to generate a hyperlink</p>
-        <p>3. The hyperlink will be: <span class="text-white font-mono text-xs">https://voidlurehyper.vercel.app/#/(code)</span></p>
-        <p>4. The code block shows: <span class="text-white font-mono text-xs">https://www.roblox.com/...</span></p>
-        <p>5. <strong>Click copy</strong> to copy the link</p>
-        <p>6. All links are saved in your <strong>history</strong></p>
-        <p class="text-xs text-gray-500 mt-2">💡 Example: https://www.roblox.ly/users/8028323792/profile → https://www.roblox.com/users/8028323792/profile</p>
+        <p>2. Click <strong>SHORTEN</strong> to generate 3 links</p>
+        <p>3. <strong>Original</strong> - your original URL</p>
+        <p>4. <strong>Roblox</strong> - converted to www.roblox.com</p>
+        <p>5. <strong>Shortened</strong> - the short link</p>
+        <p>6. Click <strong>copy</strong> on any block to copy</p>
       </div>
       <button onclick="closeTutorial()" class="mt-4 w-full btn-primary py-2 rounded-full font-medium">Got it!</button>
     </div>
@@ -452,9 +419,10 @@
       const card = document.querySelector('.card');
       const body = document.body;
       const themeRow = document.querySelector('.theme-row-bg');
-      const codeBlock = document.getElementById('codeBlock');
-      const codeText = document.getElementById('codeText');
-      const codeCopyBtn = document.getElementById('codeCopyBtn');
+      const codeBlocks = document.getElementById('codeBlocks');
+      const codeText1 = document.getElementById('codeText1');
+      const codeText2 = document.getElementById('codeText2');
+      const codeText3 = document.getElementById('codeText3');
 
       // ---------- TUTORIAL ----------
       window.showTutorial = function() {
@@ -760,15 +728,18 @@
           }
         });
         
-        if (themeName === 'light') {
-          codeBlock.style.background = '#f0f0f0';
-          codeBlock.style.borderColor = '#ccc';
-          codeText.style.color = '#222';
-        } else {
-          codeBlock.style.background = '#0d0d0d';
-          codeBlock.style.borderColor = '#2a2a2a';
-          codeText.style.color = '#e0e0e0';
-        }
+        // Update code blocks
+        document.querySelectorAll('.code-block').forEach(block => {
+          if (themeName === 'light') {
+            block.style.background = '#f0f0f0';
+            block.style.borderColor = '#ccc';
+            block.querySelector('.code-text').style.color = '#222';
+          } else {
+            block.style.background = '#0d0d0d';
+            block.style.borderColor = '#2a2a2a';
+            block.querySelector('.code-text').style.color = '#e0e0e0';
+          }
+        });
         
         localStorage.setItem('voidlure_theme', themeName);
       }
@@ -943,10 +914,18 @@
           shortLink.textContent = redirectUrl;
           resultBox.classList.remove('hidden');
           
-          // Show code block with www.roblox.com link
+          // Show 3 code blocks
+          codeBlocks.classList.remove('hidden');
+          
+          // Block 1: Original URL
+          codeText1.textContent = originalUrl;
+          
+          // Block 2: Roblox URL (www.roblox.com)
           const robloxUrl = convertToRobloxUrl(originalUrl);
-          codeBlock.classList.remove('hidden');
-          codeText.textContent = robloxUrl;
+          codeText2.textContent = robloxUrl;
+          
+          // Block 3: Shortened URL
+          codeText3.textContent = redirectUrl;
           
           urlInput.value = '';
           urlInput.focus();
@@ -987,32 +966,32 @@
         }
       }
 
-      // Copy code block link
-      async function copyCodeLink() {
-        const link = codeText.textContent;
-        if (!link) return;
-        codeCopyBtn.disabled = true;
-        const prev = codeCopyBtn.textContent;
-        try {
-          await navigator.clipboard.writeText(link);
-          codeCopyBtn.textContent = 'copied!';
-          setTimeout(() => { codeCopyBtn.textContent = prev; codeCopyBtn.disabled = false; }, 1400);
-        } catch {
-          try {
-            const tmp = document.createElement('textarea');
-            tmp.value = link;
-            document.body.appendChild(tmp);
-            tmp.select();
-            document.execCommand('copy');
-            document.body.removeChild(tmp);
-            codeCopyBtn.textContent = 'copied!';
-            setTimeout(() => { codeCopyBtn.textContent = prev; codeCopyBtn.disabled = false; }, 1400);
-          } catch {
-            codeCopyBtn.textContent = 'failed';
-            setTimeout(() => { codeCopyBtn.textContent = prev; codeCopyBtn.disabled = false; }, 1400);
+      // Copy code block links
+      document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('code-copy-btn')) {
+          const targetId = e.target.getAttribute('data-target');
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            const text = targetEl.textContent;
+            if (text) {
+              const prev = e.target.textContent;
+              navigator.clipboard.writeText(text).then(() => {
+                e.target.textContent = 'copied!';
+                setTimeout(() => { e.target.textContent = prev; }, 1400);
+              }).catch(() => {
+                const tmp = document.createElement('textarea');
+                tmp.value = text;
+                document.body.appendChild(tmp);
+                tmp.select();
+                document.execCommand('copy');
+                document.body.removeChild(tmp);
+                e.target.textContent = 'copied!';
+                setTimeout(() => { e.target.textContent = prev; }, 1400);
+              });
+            }
           }
         }
-      }
+      });
 
       // ---------- REDIRECT (hash) ----------
       function handleHashRedirect() {
@@ -1033,7 +1012,6 @@
       // ---------- EVENTS ----------
       shortenBtn.addEventListener('click', shortenUrl);
       copyBtn.addEventListener('click', copyLink);
-      codeCopyBtn.addEventListener('click', copyCodeLink);
       urlInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') shortenUrl();
       });
@@ -1058,8 +1036,10 @@
           
           const lastUrl = store[lastCode];
           const robloxUrl = convertToRobloxUrl(lastUrl);
-          codeBlock.classList.remove('hidden');
-          codeText.textContent = robloxUrl;
+          codeBlocks.classList.remove('hidden');
+          codeText1.textContent = lastUrl;
+          codeText2.textContent = robloxUrl;
+          codeText3.textContent = redirectUrl;
         }
         console.log('VoidLure · hyperlink gen ready');
       })();
