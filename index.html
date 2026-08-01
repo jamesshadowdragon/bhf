@@ -372,11 +372,11 @@
       <div class="space-y-3 text-sm text-gray-300">
         <p>1. <strong>Paste</strong> any URL in the input field</p>
         <p>2. Click <strong>SHORTEN</strong> to generate a hyperlink</p>
-        <p>3. The hyperlink will be: <span class="text-white font-mono text-xs">voidlure.vercel.app/#/(code)</span></p>
+        <p>3. The hyperlink will be: <span class="text-white font-mono text-xs">https://voidlurehyper.vercel.app/#/(code)</span></p>
         <p>4. Click the hyperlink to open the original URL</p>
         <p>5. <strong>Click the hyperlink preview</strong> to copy the full link</p>
         <p>6. All links are saved in your <strong>history</strong></p>
-        <p class="text-xs text-gray-500 mt-2">💡 Example: https://www.roblox.ly/users/8028323792/profile → voidlure.vercel.app/#/g3hx3m</p>
+        <p class="text-xs text-gray-500 mt-2">💡 Example: https://www.roblox.ly/users/8028323792/profile → https://voidlurehyper.vercel.app/#/c2TgGpF</p>
       </div>
       <button onclick="closeTutorial()" class="mt-4 w-full btn-primary py-2 rounded-full font-medium">Got it!</button>
     </div>
@@ -386,7 +386,7 @@
     (function() {
       // ---------- CONFIG ----------
       const STORE_KEY = 'voidlure_links_v1';
-      const BASE_URL = 'voidlure.vercel.app';
+      const BASE_URL = 'voidlurehyper.vercel.app';
 
       // DOM refs
       const urlInput = document.getElementById('urlInput');
@@ -741,7 +741,18 @@
         const alphabet = 'abcdefghijklmnopqrstuvwxyz0123456789';
         const arr = new Uint8Array(len);
         crypto.getRandomValues(arr);
-        return Array.from(arr).map(n => alphabet[n % alphabet.length]).join('');
+        // Ensure first char is not a number for better readability
+        let code = '';
+        for (let i = 0; i < len; i++) {
+          if (i === 0) {
+            // Use letters for first char
+            const letters = 'abcdefghijklmnopqrstuvwxyz';
+            code += letters.charAt(Math.floor(Math.random() * letters.length));
+          } else {
+            code += alphabet.charAt(arr[i] % alphabet.length);
+          }
+        }
+        return code;
       }
 
       function isValidUrl(value) {
@@ -763,7 +774,7 @@
             if (storedUrl === originalUrl) {
               return {
                 code: code,
-                display: `voidlure.vercel.app/#/${code}`,
+                display: `https://${BASE_URL}/#/${code}`,
                 actual: originalUrl
               };
             }
@@ -774,7 +785,7 @@
           do {
             code = makeRandomCode(6);
             attempts++;
-            if (attempts > 20) { code = makeRandomCode(8); break; }
+            if (attempts > 20) { code = makeRandomCode(7); break; }
           } while (store[code]);
           
           store[code] = originalUrl;
@@ -782,7 +793,7 @@
           
           return {
             code: code,
-            display: `voidlure.vercel.app/#/${code}`,
+            display: `https://${BASE_URL}/#/${code}`,
             actual: originalUrl
           };
         } catch (_) {
@@ -792,7 +803,7 @@
 
       // Build redirect link
       function buildRedirectUrl(code) {
-        return `voidlure.vercel.app/#/${code}`;
+        return `https://${BASE_URL}/#/${code}`;
       }
 
       // ---------- UI ----------
@@ -826,7 +837,7 @@
           const redirectUrl = buildRedirectUrl(code);
           html += `<div class="history-item flex justify-between items-center text-gray-300">
             <span class="truncate max-w-[50%] text-[11px]">${url}</span>
-            <a href="https://${redirectUrl}" target="_blank" class="text-white/70 hover:text-white text-[10px] font-mono">${redirectUrl}</a>
+            <a href="${redirectUrl}" target="_blank" class="text-white/70 hover:text-white text-[10px] font-mono">${redirectUrl}</a>
           </div>`;
         });
         historyList.innerHTML = html;
@@ -865,14 +876,13 @@
           }
           
           const redirectUrl = buildRedirectUrl(hyperlink.code);
-          shortLink.href = `https://${redirectUrl}`;
+          shortLink.href = redirectUrl;
           shortLink.textContent = redirectUrl;
           resultBox.classList.remove('hidden');
           
           // Show hyperlink preview with full link
           hyperlinkPreview.classList.remove('hidden');
           hyperlinkDisplay.innerHTML = `
-            <span class="text-gray-400">https://</span>
             <span class="highlight">${redirectUrl}</span>
           `;
           
@@ -919,15 +929,14 @@
       hyperlinkPreview.addEventListener('click', function() {
         const linkText = shortLink.textContent;
         if (linkText) {
-          const fullLink = `https://${linkText}`;
-          navigator.clipboard.writeText(fullLink).then(() => {
+          navigator.clipboard.writeText(linkText).then(() => {
             const original = hyperlinkDisplay.innerHTML;
             hyperlinkDisplay.innerHTML = '✅ Copied!';
             setTimeout(() => { hyperlinkDisplay.innerHTML = original; }, 1500);
           }).catch(() => {
             // Fallback
             const textarea = document.createElement('textarea');
-            textarea.value = fullLink;
+            textarea.value = linkText;
             document.body.appendChild(textarea);
             textarea.select();
             document.execCommand('copy');
@@ -976,13 +985,12 @@
         if (keys.length > 0) {
           const lastCode = keys[keys.length - 1];
           const redirectUrl = buildRedirectUrl(lastCode);
-          shortLink.href = `https://${redirectUrl}`;
+          shortLink.href = redirectUrl;
           shortLink.textContent = redirectUrl;
           resultBox.classList.remove('hidden');
           
           hyperlinkPreview.classList.remove('hidden');
           hyperlinkDisplay.innerHTML = `
-            <span class="text-gray-400">https://</span>
             <span class="highlight">${redirectUrl}</span>
           `;
         }
