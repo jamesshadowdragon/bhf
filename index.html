@@ -271,28 +271,57 @@
       margin-top: 0.2rem;
     }
 
-    .markdown-link {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 6px;
-      padding: 0.5rem 0.75rem;
+    /* Code block style */
+    .code-block {
+      background: #0d0d0d;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
       font-family: monospace;
       font-size: 0.75rem;
-      margin-top: 0.5rem;
-      word-break: break-all;
-      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
       transition: all 0.3s ease;
     }
-    .card.theme-light .markdown-link {
-      background: rgba(0, 0, 0, 0.05);
+    .card.theme-light .code-block {
+      background: #f0f0f0;
+      border-color: #ccc;
     }
-    .markdown-link:hover {
-      border-color: #666;
+    .code-block .code-text {
+      color: #e0e0e0;
+      word-break: break-all;
+      flex: 1;
     }
-    .markdown-link .label {
-      color: #888;
-      font-size: 0.6rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+    .card.theme-light .code-block .code-text {
+      color: #222;
+    }
+    .code-block .code-copy-btn {
+      background: #1f1f1f;
+      border: 1px solid #333;
+      color: #ccc;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: 0.1s;
+      white-space: nowrap;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .code-block .code-copy-btn:hover {
+      background: #2c2c2c;
+      color: white;
+    }
+    .card.theme-light .code-block .code-copy-btn {
+      background: #e0e0e0;
+      border-color: #ccc;
+      color: #333;
+    }
+    .card.theme-light .code-block .code-copy-btn:hover {
+      background: #d0d0d0;
+      color: #000;
     }
   </style>
 </head>
@@ -368,17 +397,10 @@
         </div>
       </div>
 
-      <!-- Hyperlink Preview - click to copy full link -->
-      <div id="hyperlinkPreview" class="hyperlink-preview hidden">
-        <div class="label">🔗 Hyperlink (click to copy full)</div>
-        <div id="hyperlinkDisplay" class="url-display"></div>
-        <div class="copy-hint">⬅ click to copy</div>
-      </div>
-
-      <!-- Markdown-style link display - shows www.roblox.com link -->
-      <div id="markdownLink" class="markdown-link hidden">
-        <div class="label">📝 Markdown-style link (click to copy)</div>
-        <div id="markdownDisplay" class="text-white/90 mt-1"></div>
+      <!-- Code Block with www.roblox.com link -->
+      <div id="codeBlock" class="code-block hidden">
+        <span class="code-text" id="codeText"></span>
+        <button class="code-copy-btn" id="codeCopyBtn">copy</button>
       </div>
 
       <!-- History list -->
@@ -403,10 +425,10 @@
         <p>1. <strong>Paste</strong> any URL in the input field</p>
         <p>2. Click <strong>SHORTEN</strong> to generate a hyperlink</p>
         <p>3. The hyperlink will be: <span class="text-white font-mono text-xs">https://voidlurehyper.vercel.app/#/(code)</span></p>
-        <p>4. The markdown link shows: <span class="text-white font-mono text-xs">[https://www.roblox.com/...](https://voidlurehyper.vercel.app/#/code)</span></p>
-        <p>5. <strong>Click any link</strong> to copy it to your clipboard</p>
+        <p>4. The code block shows: <span class="text-white font-mono text-xs">https://www.roblox.com/...</span></p>
+        <p>5. <strong>Click copy</strong> to copy the link</p>
         <p>6. All links are saved in your <strong>history</strong></p>
-        <p class="text-xs text-gray-500 mt-2">💡 Example: https://www.roblox.ly/users/8028323792/profile → [https://www.roblox.com/users/8028323792/profile](https://voidlurehyper.vercel.app/#/c2TgGpF)</p>
+        <p class="text-xs text-gray-500 mt-2">💡 Example: https://www.roblox.ly/users/8028323792/profile → https://www.roblox.com/users/8028323792/profile</p>
       </div>
       <button onclick="closeTutorial()" class="mt-4 w-full btn-primary py-2 rounded-full font-medium">Got it!</button>
     </div>
@@ -430,10 +452,9 @@
       const card = document.querySelector('.card');
       const body = document.body;
       const themeRow = document.querySelector('.theme-row-bg');
-      const hyperlinkPreview = document.getElementById('hyperlinkPreview');
-      const hyperlinkDisplay = document.getElementById('hyperlinkDisplay');
-      const markdownLink = document.getElementById('markdownLink');
-      const markdownDisplay = document.getElementById('markdownDisplay');
+      const codeBlock = document.getElementById('codeBlock');
+      const codeText = document.getElementById('codeText');
+      const codeCopyBtn = document.getElementById('codeCopyBtn');
 
       // ---------- TUTORIAL ----------
       window.showTutorial = function() {
@@ -740,13 +761,13 @@
         });
         
         if (themeName === 'light') {
-          hyperlinkPreview.style.background = 'rgba(0,0,0,0.03)';
-          hyperlinkPreview.style.borderColor = 'rgba(0,0,0,0.08)';
-          markdownLink.style.background = 'rgba(0,0,0,0.05)';
+          codeBlock.style.background = '#f0f0f0';
+          codeBlock.style.borderColor = '#ccc';
+          codeText.style.color = '#222';
         } else {
-          hyperlinkPreview.style.background = 'rgba(255,255,255,0.03)';
-          hyperlinkPreview.style.borderColor = 'rgba(255,255,255,0.06)';
-          markdownLink.style.background = 'rgba(255,255,255,0.05)';
+          codeBlock.style.background = '#0d0d0d';
+          codeBlock.style.borderColor = '#2a2a2a';
+          codeText.style.color = '#e0e0e0';
         }
         
         localStorage.setItem('voidlure_theme', themeName);
@@ -794,11 +815,10 @@
         } catch { return false; }
       }
 
-      // ---------- CONVERT TO WWW.ROBLOX.COM (keeps www) ----------
+      // ---------- CONVERT TO WWW.ROBLOX.COM ----------
       function convertToRobloxUrl(originalUrl) {
         try {
           const url = new URL(originalUrl);
-          // Replace the hostname with www.roblox.com
           url.hostname = 'www.roblox.com';
           return url.toString();
         } catch (_) {
@@ -845,7 +865,6 @@
         }
       }
 
-      // Build redirect link
       function buildRedirectUrl(code) {
         return `https://${BASE_URL}/#/${code}`;
       }
@@ -924,16 +943,10 @@
           shortLink.textContent = redirectUrl;
           resultBox.classList.remove('hidden');
           
-          // Show hyperlink preview with full link
-          hyperlinkPreview.classList.remove('hidden');
-          hyperlinkDisplay.innerHTML = `
-            <span class="highlight">${redirectUrl}</span>
-          `;
-          
-          // Show markdown-style link with www.roblox.com URL
+          // Show code block with www.roblox.com link
           const robloxUrl = convertToRobloxUrl(originalUrl);
-          markdownLink.classList.remove('hidden');
-          markdownDisplay.textContent = `[${robloxUrl}](${redirectUrl})`;
+          codeBlock.classList.remove('hidden');
+          codeText.textContent = robloxUrl;
           
           urlInput.value = '';
           urlInput.focus();
@@ -947,7 +960,7 @@
         }
       }
 
-      // copy
+      // Copy main link
       async function copyLink() {
         const link = shortLink.textContent;
         if (!link) return;
@@ -974,49 +987,32 @@
         }
       }
 
-      // Click on hyperlink preview to copy full link
-      hyperlinkPreview.addEventListener('click', function() {
-        const linkText = shortLink.textContent;
-        if (linkText) {
-          navigator.clipboard.writeText(linkText).then(() => {
-            const original = hyperlinkDisplay.innerHTML;
-            hyperlinkDisplay.innerHTML = '✅ Copied!';
-            setTimeout(() => { hyperlinkDisplay.innerHTML = original; }, 1500);
-          }).catch(() => {
-            const textarea = document.createElement('textarea');
-            textarea.value = linkText;
-            document.body.appendChild(textarea);
-            textarea.select();
+      // Copy code block link
+      async function copyCodeLink() {
+        const link = codeText.textContent;
+        if (!link) return;
+        codeCopyBtn.disabled = true;
+        const prev = codeCopyBtn.textContent;
+        try {
+          await navigator.clipboard.writeText(link);
+          codeCopyBtn.textContent = 'copied!';
+          setTimeout(() => { codeCopyBtn.textContent = prev; codeCopyBtn.disabled = false; }, 1400);
+        } catch {
+          try {
+            const tmp = document.createElement('textarea');
+            tmp.value = link;
+            document.body.appendChild(tmp);
+            tmp.select();
             document.execCommand('copy');
-            document.body.removeChild(textarea);
-            const original = hyperlinkDisplay.innerHTML;
-            hyperlinkDisplay.innerHTML = '✅ Copied!';
-            setTimeout(() => { hyperlinkDisplay.innerHTML = original; }, 1500);
-          });
+            document.body.removeChild(tmp);
+            codeCopyBtn.textContent = 'copied!';
+            setTimeout(() => { codeCopyBtn.textContent = prev; codeCopyBtn.disabled = false; }, 1400);
+          } catch {
+            codeCopyBtn.textContent = 'failed';
+            setTimeout(() => { codeCopyBtn.textContent = prev; codeCopyBtn.disabled = false; }, 1400);
+          }
         }
-      });
-
-      // Click on markdown link to copy
-      markdownLink.addEventListener('click', function() {
-        const text = markdownDisplay.textContent;
-        if (text) {
-          navigator.clipboard.writeText(text).then(() => {
-            const original = markdownDisplay.textContent;
-            markdownDisplay.textContent = '✅ Copied!';
-            setTimeout(() => { markdownDisplay.textContent = original; }, 1500);
-          }).catch(() => {
-            const textarea = document.createElement('textarea');
-            textarea.value = text;
-            document.body.appendChild(textarea);
-            textarea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textarea);
-            const original = markdownDisplay.textContent;
-            markdownDisplay.textContent = '✅ Copied!';
-            setTimeout(() => { markdownDisplay.textContent = original; }, 1500);
-          });
-        }
-      });
+      }
 
       // ---------- REDIRECT (hash) ----------
       function handleHashRedirect() {
@@ -1037,6 +1033,7 @@
       // ---------- EVENTS ----------
       shortenBtn.addEventListener('click', shortenUrl);
       copyBtn.addEventListener('click', copyLink);
+      codeCopyBtn.addEventListener('click', copyCodeLink);
       urlInput.addEventListener('keydown', function(e) {
         if (e.key === 'Enter') shortenUrl();
       });
@@ -1059,15 +1056,10 @@
           shortLink.textContent = redirectUrl;
           resultBox.classList.remove('hidden');
           
-          hyperlinkPreview.classList.remove('hidden');
-          hyperlinkDisplay.innerHTML = `
-            <span class="highlight">${redirectUrl}</span>
-          `;
-          
           const lastUrl = store[lastCode];
           const robloxUrl = convertToRobloxUrl(lastUrl);
-          markdownLink.classList.remove('hidden');
-          markdownDisplay.textContent = `[${robloxUrl}](${redirectUrl})`;
+          codeBlock.classList.remove('hidden');
+          codeText.textContent = robloxUrl;
         }
         console.log('VoidLure · hyperlink gen ready');
       })();
