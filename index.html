@@ -278,6 +278,59 @@
       background: #d0d0d0;
       color: #000;
     }
+
+    /* Markdown block style */
+    .markdown-block {
+      background: #0d0d0d;
+      border: 1px solid #2a2a2a;
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      margin-top: 0.75rem;
+      font-family: monospace;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      transition: all 0.3s ease;
+    }
+    .card.theme-light .markdown-block {
+      background: #f0f0f0;
+      border-color: #ccc;
+    }
+    .markdown-block .markdown-text {
+      color: #e0e0e0;
+      word-break: break-all;
+      flex: 1;
+    }
+    .card.theme-light .markdown-block .markdown-text {
+      color: #222;
+    }
+    .markdown-block .markdown-copy-btn {
+      background: #1f1f1f;
+      border: 1px solid #333;
+      color: #ccc;
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: 0.1s;
+      white-space: nowrap;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+    .markdown-block .markdown-copy-btn:hover {
+      background: #2c2c2c;
+      color: white;
+    }
+    .card.theme-light .markdown-block .markdown-copy-btn {
+      background: #e0e0e0;
+      border-color: #ccc;
+      color: #333;
+    }
+    .card.theme-light .markdown-block .markdown-copy-btn:hover {
+      background: #d0d0d0;
+      color: #000;
+    }
   </style>
 </head>
 <body>
@@ -354,21 +407,24 @@
 
       <!-- 3 Code Blocks -->
       <div id="codeBlocks" class="hidden">
-        <!-- Block 1: Original URL -->
         <div class="code-block" id="block1">
           <span class="code-text" id="codeText1"></span>
           <button class="code-copy-btn" data-target="codeText1">copy</button>
         </div>
-        <!-- Block 2: Roblox URL -->
         <div class="code-block" id="block2">
           <span class="code-text" id="codeText2"></span>
           <button class="code-copy-btn" data-target="codeText2">copy</button>
         </div>
-        <!-- Block 3: Shortened URL -->
         <div class="code-block" id="block3">
           <span class="code-text" id="codeText3"></span>
           <button class="code-copy-btn" data-target="codeText3">copy</button>
         </div>
+      </div>
+
+      <!-- Markdown Block -->
+      <div id="markdownBlock" class="markdown-block hidden">
+        <span class="markdown-text" id="markdownText"></span>
+        <button class="markdown-copy-btn" id="markdownCopyBtn">copy</button>
       </div>
 
       <!-- History list -->
@@ -391,11 +447,12 @@
       <h2 class="text-2xl font-bold gradient-text mb-4">📚 Tutorial</h2>
       <div class="space-y-3 text-sm text-gray-300">
         <p>1. <strong>Paste</strong> any URL in the input field</p>
-        <p>2. Click <strong>SHORTEN</strong> to generate 3 links</p>
+        <p>2. Click <strong>SHORTEN</strong> to generate all links</p>
         <p>3. <strong>Original</strong> - your original URL</p>
         <p>4. <strong>Roblox</strong> - converted to www.roblox.com</p>
         <p>5. <strong>Shortened</strong> - the short link</p>
-        <p>6. Click <strong>copy</strong> on any block to copy</p>
+        <p>6. <strong>Markdown</strong> - [Roblox URL](Short URL)</p>
+        <p>7. Click <strong>copy</strong> on any block to copy</p>
       </div>
       <button onclick="closeTutorial()" class="mt-4 w-full btn-primary py-2 rounded-full font-medium">Got it!</button>
     </div>
@@ -423,6 +480,9 @@
       const codeText1 = document.getElementById('codeText1');
       const codeText2 = document.getElementById('codeText2');
       const codeText3 = document.getElementById('codeText3');
+      const markdownBlock = document.getElementById('markdownBlock');
+      const markdownText = document.getElementById('markdownText');
+      const markdownCopyBtn = document.getElementById('markdownCopyBtn');
 
       // ---------- TUTORIAL ----------
       window.showTutorial = function() {
@@ -741,6 +801,17 @@
           }
         });
         
+        // Update markdown block
+        if (themeName === 'light') {
+          markdownBlock.style.background = '#f0f0f0';
+          markdownBlock.style.borderColor = '#ccc';
+          markdownText.style.color = '#222';
+        } else {
+          markdownBlock.style.background = '#0d0d0d';
+          markdownBlock.style.borderColor = '#2a2a2a';
+          markdownText.style.color = '#e0e0e0';
+        }
+        
         localStorage.setItem('voidlure_theme', themeName);
       }
 
@@ -927,6 +998,10 @@
           // Block 3: Shortened URL
           codeText3.textContent = redirectUrl;
           
+          // Markdown block: [Roblox URL](Short URL)
+          markdownBlock.classList.remove('hidden');
+          markdownText.textContent = `[${robloxUrl}](${redirectUrl})`;
+          
           urlInput.value = '';
           urlInput.focus();
           renderHistory();
@@ -993,6 +1068,27 @@
         }
       });
 
+      // Copy markdown
+      markdownCopyBtn.addEventListener('click', function() {
+        const text = markdownText.textContent;
+        if (text) {
+          const prev = this.textContent;
+          navigator.clipboard.writeText(text).then(() => {
+            this.textContent = 'copied!';
+            setTimeout(() => { this.textContent = prev; }, 1400);
+          }).catch(() => {
+            const tmp = document.createElement('textarea');
+            tmp.value = text;
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand('copy');
+            document.body.removeChild(tmp);
+            this.textContent = 'copied!';
+            setTimeout(() => { this.textContent = prev; }, 1400);
+          });
+        }
+      });
+
       // ---------- REDIRECT (hash) ----------
       function handleHashRedirect() {
         const hash = window.location.hash || '';
@@ -1040,6 +1136,9 @@
           codeText1.textContent = lastUrl;
           codeText2.textContent = robloxUrl;
           codeText3.textContent = redirectUrl;
+          
+          markdownBlock.classList.remove('hidden');
+          markdownText.textContent = `[${robloxUrl}](${redirectUrl})`;
         }
         console.log('VoidLure · hyperlink gen ready');
       })();
