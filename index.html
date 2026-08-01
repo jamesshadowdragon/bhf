@@ -988,9 +988,10 @@
           // Convert to Roblox URL
           const robloxUrl = convertToRobloxUrl(originalUrl);
           
-          // Markdown block: [Roblox URL](Short URL) - shown first
+          // Markdown block with https*:*// format (escaped colon)
+          const markdownLink = `[${robloxUrl}](${redirectUrl})`;
           markdownBlock.classList.remove('hidden');
-          markdownText.textContent = `[${robloxUrl}](${redirectUrl})`;
+          markdownText.textContent = markdownLink;
           
           // Show 3 code blocks
           codeBlocks.classList.remove('hidden');
