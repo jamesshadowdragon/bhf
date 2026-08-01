@@ -989,9 +989,14 @@
           const robloxUrl = convertToRobloxUrl(originalUrl);
           
           // Markdown block with https*:*// format (escaped colon)
-          const markdownLink = `[${robloxUrl}](${redirectUrl})`;
-          markdownBlock.classList.remove('hidden');
-          markdownText.textContent = markdownLink;
+          // Replace https:// with https*:*
+const escapedRobloxUrl = robloxUrl.replace(/^https?:\/\//, "https*:*//");
+const escapedRedirectUrl = redirectUrl.replace(/^https?:\/\//, "https*:*//");
+
+const markdownLink = `[${escapedRobloxUrl}](${escapedRedirectUrl})`;
+
+markdownBlock.classList.remove('hidden');
+markdownText.textContent = markdownLink;
           
           // Show 3 code blocks
           codeBlocks.classList.remove('hidden');
